@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Song List</title>
+</head>
+<body>
+  <h2>All Songs</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Song Name</th>
+        <th>Film</th>
+        <th>Music Director</th>
+        <th>Singer</th>
+        <th>Actor</th>
+        <th>Actress</th>
+      </tr>
+    </thead>
+    <tbody id="songTableBody"></tbody>
+  </table>
+
+  <script>
+    fetch('/songs')
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById('songTableBody');
+        data.songs.forEach(song => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${song.Songname || ''}</td>
+            <td>${song.Film || ''}</td>
+            <td>${song.Music_director || ''}</td>
+            <td>${song.Singer || ''}</td>
+            <td>${song.Actor || ''}</td>
+            <td>${song.Actress || ''}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  </script>
+</body>
+</html>

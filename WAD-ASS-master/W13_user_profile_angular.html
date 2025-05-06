@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="userApp">
+<head>
+  <meta charset="UTF-8">
+  <title>AngularJS User Auth App</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    input { width: 100%; padding: 10px; margin: 5px 0; }
+    button { padding: 10px; margin-top: 10px; }
+    .hidden { display: none; }
+    .error { color: red; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+
+<div class="container" ng-controller="UserController">
+  <!-- Registration Form -->
+  <div ng-if="!isLoggedIn && showRegister">
+    <h2>Register</h2>
+    <input type="text" ng-model="register.name" placeholder="Name" required>
+    <input type="email" ng-model="register.email" placeholder="Email" required>
+    <input type="text" ng-model="register.username" placeholder="Username" required>
+    <input type="password" ng-model="register.password" placeholder="Password" required>
+    <button ng-click="registerUser()">Register</button>
+    <p class="error">{{ regMessage }}</p>
+    <p><a href="" ng-click="toggleView()">Already have an account? Login</a></p>
+  </div>
+
+  <!-- Login Form -->
+  <div ng-if="!isLoggedIn && !showRegister">
+    <h2>Login</h2>
+    <input type="text" ng-model="login.username" placeholder="Username" required>
+    <input type="password" ng-model="login.password" placeholder="Password" required>
+    <button ng-click="loginUser()">Login</button>
+    <p class="error">{{ loginMessage }}</p>
+    <p><a href="" ng-click="toggleView()">Don't have an account? Register</a></p>
+  </div>
+
+  <!-- Profile Component -->
+  <div ng-if="isLoggedIn">
+    <h2>Welcome, {{ currentUser.name }}</h2>
+    <p><strong>Email:</strong> {{ currentUser.email }}</p>
+    <p><strong>Username:</strong> {{ currentUser.username }}</p>
+    <button ng-click="logout()">Logout</button>
+  </div>
+</div>
+
+<script>
+  angular.module('userApp', [])
+    .controller('UserController', function($scope) {
+      $scope.showRegister = true;
+      $scope.isLoggedIn = false;
+      $scope.register = {};
+      $scope.login = {};
+      $scope.currentUser = {};
+
+      // Toggle Register/Login form
+      $scope.toggleView = function() {
+        $scope.showRegister = !$scope.showRegister;
+        $scope.loginMessage = '';
+        $scope.regMessage = '';
+      };
+
+      // Register new user
+      $scope.registerUser = function() {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const existing = users.find(u => u.username === $scope.register.username);
+        if (existing) {
+          $scope.regMessage = "Username already exists.";
+          return;
+        }
+        if (!$scope.register.name || !$scope.register.email || !$scope.register.username || !$scope.register.password) {
+          $scope.regMessage = "All fields are required.";
+          return;
+        }
+
+        users.push({
+          name: $scope.register.name,
+          email: $scope.register.email,
+          username: $scope.register.username,
+          password: $scope.register.password
+        });
+        localStorage.setItem('users', JSON.stringify(users));
+        $scope.register = {};
+        $scope.regMessage = "Registration successful. Please login.";
+        $scope.showRegister = false;
+      };
+
+      // Login user
+      $scope.loginUser = function() {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.username === $scope.login.username && u.password === $scope.login.password);
+        if (user) {
+          $scope.isLoggedIn = true;
+          $scope.currentUser = user;
+          $scope.login = {};
+        } else {
+          $scope.loginMessage = "Invalid username or password.";
+        }
+      };
+
+      // Logout
+      $scope.logout = function() {
+        $scope.isLoggedIn = false;
+        $scope.currentUser = {};
+        $scope.loginMessage = '';
+      };
+    });
+</script>
+
+</body>
+</html>

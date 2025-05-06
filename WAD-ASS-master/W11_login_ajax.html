@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Registration/Login (Frontend Only)</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .toggle-link {
+      color: blue;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div id="registerSection">
+      <h2>Register (Simulated)</h2>
+      <form id="registerForm">
+        <div class="form-group"><input type="text" id="name" placeholder="Full Name" required /></div>
+        <div class="form-group"><input type="email" id="email" placeholder="Email" required /></div>
+        <div class="form-group"><input type="text" id="username" placeholder="Username" required /></div>
+        <div class="form-group"><input type="password" id="password" placeholder="Password" required /></div>
+        <button type="submit">Register</button>
+        <p id="registerMessage" class="error"></p>
+      </form>
+      <p>Already have an account? <span class="toggle-link" id="showLogin">Login here</span></p>
+    </div>
+
+    <div id="loginSection" class="hidden">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <div class="form-group"><input type="text" id="loginUsername" placeholder="Username" required /></div>
+        <div class="form-group"><input type="password" id="loginPassword" placeholder="Password" required /></div>
+        <button type="submit">Login</button>
+        <p id="loginMessage" class="error"></p>
+      </form>
+      <p>Don't have an account? <span class="toggle-link" id="showRegister">Register here</span></p>
+    </div>
+
+    <div id="welcomeSection" class="hidden">
+      <h3>Welcome, <span id="userWelcome"></span>!</h3>
+      <button id="logout">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    let users = [];
+
+    // Load user data from JSON
+    function loadUsers(callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "users.json", true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          users = JSON.parse(xhr.responseText);
+          callback();
+        } else {
+          alert("Could not load user data.");
+        }
+      };
+      xhr.send();
+    }
+
+    // Toggle login/register
+    document.getElementById("showLogin").onclick = () => {
+      document.getElementById("registerSection").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
+    };
+    document.getElementById("showRegister").onclick = () => {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("registerSection").classList.remove("hidden");
+    };
+    document.getElementById("logout").onclick = () => {
+      document.getElementById("welcomeSection").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
+    };
+
+    // Simulate registration (adds to local array, not JSON)
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const msg = document.getElementById("registerMessage");
+
+      const newUser = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value,
+      };
+
+      const exists = users.some(u => u.username === newUser.username);
+      if (exists) {
+        msg.textContent = "Username already exists.";
+        msg.className = "error";
+      } else {
+        users.push(newUser);
+        msg.textContent = "Registered successfully!";
+        msg.className = "success";
+        this.reset();
+        setTimeout(() => {
+          document.getElementById("registerSection").classList.add("hidden");
+          document.getElementById("loginSection").classList.remove("hidden");
+          msg.textContent = "";
+        }, 1500);
+      }
+    });
+
+    // Handle login
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const msg = document.getElementById("loginMessage");
+      const username = document.getElementById("loginUsername").value;
+      const password = document.getElementById("loginPassword").value;
+
+      const user = users.find(u => u.username === username && u.password === password);
+      if (user) {
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("welcomeSection").classList.remove("hidden");
+        document.getElementById("userWelcome").textContent = user.name;
+        msg.textContent = "";
+      } else {
+        msg.textContent = "Invalid username or password.";
+        msg.className = "error";
+      }
+    });
+
+    // Load users when page loads
+    window.onload = () => {
+      loadUsers(() => console.log("Users loaded."));
+    };
+  </script>
+</body>
+
+</html>

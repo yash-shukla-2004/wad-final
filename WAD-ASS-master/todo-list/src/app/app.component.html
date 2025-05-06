@@ -1,0 +1,15 @@
+<div>
+  <h1>Todo List</h1>
+  <input type="text" [(ngModel)]="task">
+  <button (click)="onAdd()">Add</button>
+
+  @for(task of taskList; track task.id) {
+      <div>
+        <p>{{task.id}}</p>
+        <p>{{task.taskName}}</p>
+        <p><button (click)="edit(task.id)">Edit</button>
+            <button (click)="delete(task.id)">Delete</button>
+        </p>
+      </div>
+  }
+</div>

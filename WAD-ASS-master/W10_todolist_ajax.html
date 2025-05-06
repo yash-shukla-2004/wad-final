@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Static To-Do List</title>
+    <style>
+      body {
+        font-family: Arial;
+        background: #f4f4f4;
+        padding: 20px;
+      }
+      .todo-container {
+        max-width: 400px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="todo-container">
+      <div>
+        <input type="text" id="input" />
+        <button onclick="add()">add</button>
+      </div>
+      <h2 id="header"></h2>
+      <ul id="taskList"></ul>
+    </div>
+
+    <script>
+      const val = document.getElementById("input");
+      let task = [];
+      let editID = -1;
+
+      function add() {
+        if (val.value.trim() === "") return;
+
+        if (editID !== -1) {
+          task[editID].text = val.value;
+          editID = -1;
+        } else {
+          task.push({ text: val.value });
+        }
+        val.value = "";
+        renderTasks();
+      }
+
+      function edit(id) {
+        editID = id;
+        val.value = task[id].text;
+      }
+
+      function deleteTask(id) {
+        task = task.filter((_, idx) => idx !== id);
+        renderTasks();
+      }
+
+      function loadTasks() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "to-do.json", true);
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            task = JSON.parse(xhr.responseText);
+            renderTasks();
+          } else {
+            alert("Could not load tasks.");
+          }
+        };
+        xhr.send();
+      }
+
+      function renderTasks() {
+        if (task.length === 0) {
+          document.getElementById('header').innerText = 'No task to display'
+        } else {
+          document.getElementById('header').innerText = 'Upcoming task'
+        }
+        const list = document.getElementById("taskList");
+        list.innerHTML = "";
+        task.forEach((item, idx) => {
+          const li = document.createElement("li");
+          const span = document.createElement("span");
+          const buttonsDiv = document.createElement("div");
+          span.textContent = item.text;
+
+          const btn1 = document.createElement("button");
+          btn1.textContent = "Edit";
+          btn1.onclick = () => edit(idx);
+
+          const btn2 = document.createElement("button");
+          btn2.textContent = "Delete";
+          btn2.onclick = () => deleteTask(idx);
+
+          buttonsDiv.appendChild(btn1);
+          buttonsDiv.appendChild(btn2);
+          li.appendChild(span);
+          li.appendChild(buttonsDiv);
+          list.appendChild(li);
+        });
+      }
+
+      loadTasks();
+    </script>
+  </body>
+</html>

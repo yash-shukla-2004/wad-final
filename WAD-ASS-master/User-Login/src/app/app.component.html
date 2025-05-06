@@ -1,0 +1,77 @@
+<div>
+  @if(!isLogin && !success) {
+  <h1>User Registration</h1>
+
+  <form style="display: flex; flex-direction: column; width: 200px; gap: 4px">
+    <input
+      type="text"
+      name="roll"
+      id=""
+      placeholder="Roll No."
+      [(ngModel)]="user.rollno"
+    />
+    <input
+      type="text"
+      name="roll"
+      id=""
+      placeholder="Name"
+      [(ngModel)]="user.name"
+    />
+    <input
+      type="number"
+      name="roll"
+      id=""
+      placeholder="Phone"
+      [(ngModel)]="user.phone"
+    />
+    <input
+      type="text"
+      name="roll"
+      id=""
+      placeholder="Password"
+      [(ngModel)]="user.pass"
+    />
+    <button type="submit" (click)="register()">Submit</button>
+  </form>
+
+  <button (click)="toggleLogin()">Already registered</button>
+  } @if(isLogin && !success) {
+  <div>User Login</div>
+  <form style="display: flex; flex-direction: column; width: 200px; gap: 4px">
+    <input
+      type="text"
+      name="roll"
+      id=""
+      placeholder="Roll No."
+      [(ngModel)]="user.rollno"
+    />
+    <input
+      type="text"
+      name="roll"
+      id=""
+      placeholder="Name"
+      [(ngModel)]="user.name"
+    />
+    <input
+      type="text"
+      name="pass"
+      id=""
+      placeholder="Password"
+      [(ngModel)]="user.pass"
+    />
+    <button type="submit" (click)="login()">Submit</button>
+  </form>
+
+  }
+  @if(success){
+    <div>
+      <h1>User data</h1>
+      <div>
+        <p>Name : {{user.name}}</p>
+        <p>roll : {{user.rollno}}</p>
+        <p>phone : {{user.phone}}</p>
+      </div>
+      <button (click)="logout()">Logout</button>
+    </div>
+  }
+</div>
